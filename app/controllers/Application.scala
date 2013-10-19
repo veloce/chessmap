@@ -18,10 +18,7 @@ object Application extends Controller {
 
   def stream = Action {
     Consumer("http://en.lichess.org/stream")
-    val lichessStream = Enumerator.repeatM[String](
-      Future.successful(Consumer.moves.dequeue())
-    )
-    val eventsStream = lichessStream &> EventSource()
+    val eventsStream = Consumer.enumerator &> EventSource()
     Ok.chunked(eventsStream).as("text/event-stream")
   }
 

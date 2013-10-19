@@ -14,7 +14,7 @@ import akka.event.Logging
 
 object Consumer {
 
-  val moves = new Queue[String]
+  val (enumerator, channel) = Concurrent.broadcast[String]
 
   def apply(url: String) {
     WS.url(url).get(consumer _)
@@ -26,6 +26,6 @@ object Consumer {
     }
 
   private def retrieve(line: String) {
-    moves += line
+    channel.push(line)
   }
 }
