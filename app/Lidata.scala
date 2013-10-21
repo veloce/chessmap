@@ -212,6 +212,9 @@ object LiData {
     "25r6nol3 e1d2 88.70.146.158",
     "mqt8y0dh f4f5 188.129.114.203"
   )
-  val enumerator = Enumerator.repeat(iterator.next())
+  val enumerator = Enumerator.repeat {
+    Thread sleep 100
+    iterator.next()
+  }
   val iterator = Stream.continually(data.toStream).flatten.toIterator
 }

@@ -21,7 +21,7 @@ class LichessActor extends Actor {
 
   def receive = {
     case "start" ⇒ {
-      val future = Consumer("http://en.lichess.org/stream")
+      val future = Consumer("http://localhost:9000/suckit")
       // TODO
       // restart if connection if closed
       // try to reconnect
