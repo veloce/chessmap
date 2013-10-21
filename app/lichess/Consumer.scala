@@ -16,7 +16,7 @@ object Consumer {
 
   val (enumerator, channel) = Concurrent.broadcast[String]
 
-  def apply(url: String) {
+  def apply(url: String): Future[Iteratee[Array[Byte], Unit]] = {
     WS.url(url).get(consumer _)
   }
 

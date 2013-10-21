@@ -1,7 +1,22 @@
-@(message: String)
-
 @main("Welcome to Play") {
 
-    @play20.welcome(message)
+<script type="text/javascript" charset="utf-8">
+var source = new EventSource("/stream");
+source.addEventListener('message', function(e) {
+  console.log(e.data);
+}, false);
+source.addEventListener('open', function(e) {
+  // Connection was opened.
+  console.log("connection opened");
+}, false);
+source.addEventListener('error', function(e) {
+  if (e.readyState == EventSource.CLOSED) {
+    // Connection was closed.
+    console.log("connection closed");
+  }
+}, false);
+</script>
+
+<h1>nothing here yet</h1>
 
 }
