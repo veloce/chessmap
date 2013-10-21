@@ -1,4 +1,4 @@
-package lichess
+package chessmap.lichess
 
 import scala.collection.mutable.Queue
 
@@ -26,6 +26,7 @@ object Consumer {
     }
 
   private def retrieve(line: String) {
+    println(line)
     channel.push(line)
   }
 }

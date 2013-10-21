@@ -14,7 +14,8 @@ import akka.event.Logging
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.concurrent.Akka
 
-import lichess.Consumer
+import chessmap.lichess.Consumer
+import chessmap.LiData
 
 class LichessActor extends Actor {
 
@@ -34,6 +35,10 @@ object Application extends Controller {
 
   def index = Action {
     Ok(views.html.index())
+  }
+
+  def suckit = Action {
+    Ok.feed(LiData.enumerator)
   }
 
   def stream = Action {
