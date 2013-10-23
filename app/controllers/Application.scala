@@ -17,28 +17,14 @@ import play.api.libs.concurrent.Akka
 import chessmap.lichess.Consumer
 import chessmap.LiData
 
-class LichessActor extends Actor {
-
-  def receive = {
-    case "start" ⇒ {
-      val future = Consumer("http://localhost:9000/suckit")
-      // TODO
-      // restart if connection if closed
-      // try to reconnect
-      // future.onComplete()
-    }
-    case _      ⇒
-  }
-}
-
 object Application extends Controller {
 
   def index = Action {
     Ok(views.html.index())
   }
 
-  def suckit = Action {
-    Ok.feed(LiData.enumerator)
+  def stubdata = Action {
+    Ok.chunked(LiData.enumerator)
   }
 
   def stream = Action {

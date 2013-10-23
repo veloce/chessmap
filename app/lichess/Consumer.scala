@@ -30,3 +30,18 @@ object Consumer {
     channel.push(line)
   }
 }
+
+class Consumer extends Actor {
+
+  def receive = {
+    case "start" ⇒ {
+      val future = Consumer("http://localhost:9000/stubdata")
+      // TODO
+      // restart if connection if closed
+      // try to reconnect
+      // future.onComplete()
+    }
+    case _      ⇒
+  }
+}
+
