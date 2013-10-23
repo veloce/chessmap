@@ -14,4 +14,6 @@ libraryDependencies ++= Seq(
   "com.snowplowanalytics"  %% "scala-maxmind-geoip"  % "0.0.5"
 )
 
+scalacOptions := Seq("-deprecation", "-unchecked", "-feature", "-language:_")
+
 play.Project.playScalaSettings

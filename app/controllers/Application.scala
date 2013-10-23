@@ -3,7 +3,7 @@ package controllers
 import play.api.Play.current
 import play.api._
 import play.api.mvc._
-import play.api.libs.iteratee.{ Iteratee, Enumerator }
+import play.api.libs.iteratee.{ Iteratee, Enumerator, Concurrent }
 import libs.EventSource
 import concurrent.Future
 
@@ -15,7 +15,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.concurrent.Akka
 
 import chessmap.lichess.Consumer
-import chessmap.LiData
+import chessmap.{ StubActor, On, Off }
 
 object Application extends Controller {
 
@@ -24,7 +24,10 @@ object Application extends Controller {
   }
 
   def stubdata = Action {
-    Ok.chunked(LiData.enumerator)
+    val (enumerator, channel) = Concurrent.broadcast[String]
+    val stubActor = Akka.system.actorOf(Props(new StubActor(channel)))
+    stubActor ! On
+    Ok.chunked(enumerator)
   }
 
   def stream = Action {

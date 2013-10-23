@@ -1,9 +1,49 @@
 package chessmap
 
-import play.api.libs.iteratee.Enumerator
+import play.api.Play.current
+import play.api.libs.iteratee.{ Enumerator, Concurrent }
+import play.api.libs.iteratee.Concurrent.Channel
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.concurrent._
 
-object LiData {
+import scala.concurrent.duration._
+import akka.actor.Actor
+import akka.actor.Props
+import akka.event.Logging
+
+case object On
+case object Off
+case object Push
+
+class StubActor(channel: Channel[String]) extends Actor {
+
+  var isOn = false
+  lazy val iterator = Stream.continually(data.toStream).flatten.toIterator
+
+  def receive = {
+
+    case On ⇒ {
+      if (!isOn) {
+        isOn = true
+        self ! Push
+      }
+
+    }
+
+    case Off => {
+      isOn = false
+    }
+
+    case Push => {
+      if (isOn) {
+        channel.push(iterator.next)
+        Akka.system.scheduler.scheduleOnce(100 milliseconds) {
+          self ! Push
+        }
+      }
+    }
+  }
+
   val data = List(
     "jpoqcrmg g8h8 200.12.181.3",
     "ygj8b7iv c7c2 109.188.124.63",
@@ -212,9 +252,5 @@ object LiData {
     "25r6nol3 e1d2 88.70.146.158",
     "mqt8y0dh f4f5 188.129.114.203"
   )
-  val enumerator = Enumerator.repeat {
-    Thread sleep 100
-    iterator.next()
-  }
-  val iterator = Stream.continually(data.toStream).flatten.toIterator
 }
+
