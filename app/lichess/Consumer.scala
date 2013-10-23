@@ -8,6 +8,8 @@ import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.Play.current
 
+import akka.actor.ReceiveTimeout
+import scala.concurrent.duration._
 import akka.actor.Actor
 import akka.actor.Props
 import akka.event.Logging
@@ -18,16 +20,14 @@ object Consumer {
 
 }
 
-class Consumer extends Actor {
+class Consumer(url: String) extends Actor {
+  context.setReceiveTimeout(3 seconds)
 
   def receive = {
 
-    case Start(url) ⇒ {
+    case Start ⇒ {
       val future = WS.url(url).get(consumer _)
-      // TODO
-      // restart if connection if closed
-      // try to reconnect
-      // future.onComplete()
+      // TODO handle the case when connection is closed for some reason
     }
 
     case Handle(line) ⇒ {
@@ -36,7 +36,11 @@ class Consumer extends Actor {
       // todo geoip logic and all that stuff
     }
 
-    case _ ⇒
+    // lichess stream inactive ? try to restart it
+    case ReceiveTimeout => {
+      throw new RuntimeException("Received time out")
+    }
+
   }
 
   private def consumer(headers: ResponseHeaders): Iteratee[Array[Byte], Unit] =
@@ -48,14 +52,17 @@ class Consumer extends Actor {
 
 class Supervisor extends Actor {
 
-  def receive = {
-    case Start ⇒ {
-      val consumer = Akka.system.actorOf(Props[Consumer])
-      consumer ! Start("http://localhost:9000/stubdata")
-    }
+  val consumer = context.actorOf(Props(new Consumer("http://localhost:9000/stubdata")))
+
+  override def preStart = {
+    self ! Start
   }
+
+  def receive = {
+    case Start => consumer ! Start
+  }
+
 }
 
 case object Start
-case class Start(url: String)
 case class Handle(line: String)

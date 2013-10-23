@@ -11,7 +11,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     // start connection with lichess
     val supervisor = Akka.system.actorOf(Props[Supervisor])
-    supervisor ! Start
+    // supervisor ! Start
     Logger.info("Application has started")
   }
 
