@@ -21,14 +21,15 @@ object Consumer {
 }
 
 class Consumer(url: String) extends Actor {
-  context.setReceiveTimeout(3 seconds)
+
+  context.setReceiveTimeout(5 seconds)
+
+  override def preStart = {
+    WS.url(url).get(consumer _)
+    // TODO handle the case when connection is closed for some reason
+  }
 
   def receive = {
-
-    case Start ⇒ {
-      val future = WS.url(url).get(consumer _)
-      // TODO handle the case when connection is closed for some reason
-    }
 
     case Handle(line) ⇒ {
       println(line)
@@ -38,7 +39,7 @@ class Consumer(url: String) extends Actor {
 
     // lichess stream inactive ? try to restart it
     case ReceiveTimeout => {
-      throw new RuntimeException("Received time out")
+      throw new Exception("Received time out")
     }
 
   }
@@ -47,20 +48,6 @@ class Consumer(url: String) extends Actor {
     Iteratee foreach { bytes ⇒
       self ! Handle(new String(bytes, "UTF-8"))
     }
-
-}
-
-class Supervisor extends Actor {
-
-  val consumer = context.actorOf(Props(new Consumer("http://localhost:9000/stubdata")))
-
-  override def preStart = {
-    self ! Start
-  }
-
-  def receive = {
-    case Start => consumer ! Start
-  }
 
 }
 
