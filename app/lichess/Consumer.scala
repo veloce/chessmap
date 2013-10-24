@@ -24,8 +24,18 @@ class Consumer(url: String) extends Actor {
 
   context.setReceiveTimeout(3 seconds)
 
+  // calling run on the iteratee is a way to push an Input.EOF to it in order
+  // to close it
   override def preStart = {
-    WS.url(url).get(consumer _).map(_.run)
+    WS.url(url).get { headers =>
+      Iteratee.fold() {
+        case (a, b) =>
+          self ! Handle(new String(b, "UTF-8"))
+        }
+    }.map { _ =>
+      println("lbusdfadslf")
+
+    }
   }
 
   def receive = {
@@ -42,11 +52,6 @@ class Consumer(url: String) extends Actor {
     }
 
   }
-
-  private def consumer(headers: ResponseHeaders): Iteratee[Array[Byte], Unit] =
-    Iteratee foreach { bytes ⇒
-      self ! Handle(new String(bytes, "UTF-8"))
-    }
 
 }
 
