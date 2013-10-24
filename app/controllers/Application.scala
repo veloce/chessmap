@@ -15,19 +15,30 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.concurrent.Akka
 
 import chessmap.lichess.Consumer
-import chessmap.{ StubActor, On, Off }
+import chessmap.{ StubActor, On, Off, Push }
 
 object Application extends Controller {
+
+  val (stubEnum, stubChannel) = Concurrent.broadcast[String]
+  val stubActor = Akka.system.actorOf(Props(new StubActor(stubChannel)))
 
   def index = Action {
     Ok(views.html.index())
   }
 
   def stubdata = Action {
-    val (enumerator, channel) = Concurrent.broadcast[String]
-    val stubActor = Akka.system.actorOf(Props(new StubActor(channel)))
+    stubActor ! Push
+    Ok.chunked(stubEnum)
+  }
+
+  def stubon = Action {
     stubActor ! On
-    Ok.chunked(enumerator)
+    NoContent
+  }
+
+  def stuboff = Action {
+    stubActor ! Off
+    NoContent
   }
 
   def stream = Action {

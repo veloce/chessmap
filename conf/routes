@@ -6,6 +6,8 @@
 GET     /                           controllers.Application.index
 GET     /stream                     controllers.Application.stream
 GET     /stubdata                   controllers.Application.stubdata
+GET     /stubon                     controllers.Application.stubon
+GET     /stuboff                    controllers.Application.stuboff
 
 
 # Map static resources from the /public folder to the /assets URL path

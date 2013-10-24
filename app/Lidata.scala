@@ -17,7 +17,7 @@ case object Push
 
 class StubActor(channel: Channel[String]) extends Actor {
 
-  var isOn = false
+  var isOn = true
   lazy val iterator = Stream.continually(data.toStream).flatten.toIterator
 
   def receive = {
