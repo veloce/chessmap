@@ -18,7 +18,7 @@ case object Push
 class StubActor(channel: Channel[String]) extends Actor {
 
   var isOn = true
-  lazy val iterator = Stream.continually(data.toStream).flatten.toIterator
+  lazy val iterator = Stream.continually(Stub.data.toStream).flatten.toIterator
 
   def receive = {
 
@@ -43,7 +43,9 @@ class StubActor(channel: Channel[String]) extends Actor {
       }
     }
   }
+}
 
+object Stub {
   val data = List(
     "jpoqcrmg g8h8 200.12.181.3",
     "ygj8b7iv c7c2 109.188.124.63",
@@ -252,5 +254,34 @@ class StubActor(channel: Channel[String]) extends Actor {
     "25r6nol3 e1d2 88.70.146.158",
     "mqt8y0dh f4f5 188.129.114.203"
   )
+
+  val enumerator = Enumerator(
+    "jpoqcrmg g8h8 200.12.181.3",
+    "ygj8b7iv c7c2 109.188.124.63",
+    "ygj8b7iv f2f4 91.121.7.111",
+    "bb2y20qy d1d7 79.82.34.175",
+    "3am5vq6c b7b5 93.130.236.75",
+    "tunee74u e5f3 2.185.136.202",
+    "w43rdkc6 c7c5 190.39.118.62",
+    "kwm4ru4c d1a4 83.203.216.79",
+    "3am5vq6c e3d3 95.158.30.92",
+    "kwm4ru4c b4d6 91.121.7.111",
+    "pqlojt0f c2c3 88.11.35.140",
+    "wxzdjepx f6g7 186.54.144.82",
+    "ri402woh c8d7 186.120.157.217",
+    "f1t7v4a2 d8e7 178.83.62.172",
+    "wxzdjepx c1c5 91.121.7.111",
+    "z13oklod h8h7 86.57.56.75",
+    "foge48a4 e6d6 85.26.184.89",
+    "ri402woh f3e5 91.121.7.111",
+    "ot17yc30 f5f6 193.126.151.142",
+    "3u7nbw0p g5g6 151.51.96.68",
+    "7nfkodrg c5c6 75.164.205.194",
+    "f1t7v4a2 c1g5 91.121.7.111",
+    "foge48a4 d8c8 91.121.7.111",
+    "3u7nbw0p c6f3 91.121.7.111",
+    "ertua3bf e7e6 188.242.207.49"
+  )
 }
+
 

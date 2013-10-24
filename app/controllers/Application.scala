@@ -15,7 +15,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.concurrent.Akka
 
 import chessmap.lichess.Consumer
-import chessmap.{ StubActor, On, Off, Push }
+import chessmap.{ Stub, StubActor, On, Off, Push }
 
 object Application extends Controller {
 
@@ -26,9 +26,13 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
-  def stubdata = Action {
+  def infstub = Action {
     stubActor ! Push
     Ok.chunked(stubEnum)
+  }
+
+  def stub = Action {
+    Ok.chunked(Stub.enumerator)
   }
 
   def stubon = Action {

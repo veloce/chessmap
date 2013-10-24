@@ -5,7 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /stream                     controllers.Application.stream
-GET     /stubdata                   controllers.Application.stubdata
+GET     /stub                       controllers.Application.stub
+GET     /infstub                    controllers.Application.infstub
 GET     /stubon                     controllers.Application.stubon
 GET     /stuboff                    controllers.Application.stuboff
 

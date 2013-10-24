@@ -22,17 +22,16 @@ object Consumer {
 
 class Consumer(url: String) extends Actor {
 
-  context.setReceiveTimeout(5 seconds)
+  context.setReceiveTimeout(3 seconds)
 
   override def preStart = {
-    WS.url(url).get(consumer _)
-    // TODO handle the case when connection is closed for some reason
+    WS.url(url).get(consumer _).map(_.run)
   }
 
   def receive = {
 
     case Handle(line) ⇒ {
-      println(line)
+      println("handled", line)
       Consumer.channel.push(line)
       // todo geoip logic and all that stuff
     }
