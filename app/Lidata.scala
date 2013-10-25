@@ -17,30 +17,26 @@ case object Push
 
 class StubActor(channel: Channel[String]) extends Actor {
 
-  var isOn = true
   lazy val iterator = Stream.continually(Stub.data.toStream).flatten.toIterator
 
-  def receive = {
+  def receive = on
 
-    case On ⇒ {
-      if (!isOn) {
-        isOn = true
-        self ! Push
-      }
+  def on: Receive = {
+    case Off => context become off
+    case Push => push
+  }
 
+  def off: Receive = {
+    case On => {
+      push
+      context become on
     }
+  }
 
-    case Off => {
-      isOn = false
-    }
-
-    case Push => {
-      if (isOn) {
-        channel.push(iterator.next)
-        Akka.system.scheduler.scheduleOnce(100 milliseconds) {
-          self ! Push
-        }
-      }
+  private def push = {
+    channel.push(iterator.next)
+    Akka.system.scheduler.scheduleOnce(100 milliseconds) {
+      self ! Push
     }
   }
 }
