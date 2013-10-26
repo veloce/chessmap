@@ -24,10 +24,6 @@ class Connection(url: String) extends Actor {
 
   def receive = {
 
-    case Handle(line) ⇒ {
-      // todo geoip logic and all that stuff
-    }
-
     case ConnectionClosed ⇒ {
       Thread.sleep(3000)
       throw new Exception("Connection closed")
@@ -38,4 +34,3 @@ class Connection(url: String) extends Actor {
 }
 
 case object ConnectionClosed
-case class Handle(line: String)
