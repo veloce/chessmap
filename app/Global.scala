@@ -9,7 +9,9 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     // start connection with lichess
-    val consumer = Akka.system.actorOf(Props(new Connection("http://localhost:9000/stub")))
+    val url = current.configuration.getString("lichess.stream_url")
+      .getOrElse("http://en.lichess.org/stream")
+    val consumer = Akka.system.actorOf(Props(new Connection(url)))
     Logger.info("Application has started")
   }
 
