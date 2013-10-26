@@ -14,7 +14,7 @@ import akka.event.Logging
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.concurrent.Akka
 
-import chessmap.lichess.Consumer
+import models.LichessStream
 import chessmap.{ Stub, StubActor, On, Off, Push }
 
 object Application extends Controller {
@@ -46,7 +46,7 @@ object Application extends Controller {
   }
 
   def stream = Action {
-    val eventsStream = Consumer.enumerator &> EventSource()
+    val eventsStream = LichessStream.enumerator &> EventSource()
     Ok.chunked(eventsStream).as("text/event-stream")
   }
 
