@@ -3,7 +3,8 @@
 <script type="text/javascript" charset="utf-8">
 var source = new EventSource("/stream");
 source.addEventListener('message', function(e) {
-  console.log(e.data);
+  var json = JSON.parse(e.data)
+  console.log(json);
 }, false);
 source.addEventListener('open', function(e) {
   // Connection was opened.
