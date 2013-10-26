@@ -22,15 +22,17 @@ class StubActor(channel: Channel[String]) extends Actor {
   def receive = on
 
   def on: Receive = {
-    case Off => context become off
-    case Push => push
+    case Off  ⇒ context become off
+    case Push ⇒ push
+    case _    ⇒
   }
 
   def off: Receive = {
-    case On => {
+    case On ⇒ {
       push
       context become on
     }
+    case _ ⇒
   }
 
   private def push = {
@@ -279,5 +281,4 @@ object Stub {
     "ertua3bf e7e6 188.242.207.49"
   )
 }
-
 
