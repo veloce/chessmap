@@ -25,7 +25,6 @@ class Consumer(url: String) extends Actor {
   override def preStart = {
     WS.url(url).get { headers ⇒
       Iteratee.foreach { bytes ⇒
-        println("&&&& iteratee still running &&&&&")
         self ! Handle(new String(bytes, "UTF-8"))
       }
     }.onComplete { _ ⇒
