@@ -4,7 +4,7 @@ import play.api.Play.current
 
 import akka.actor.Props
 
-import chessmap.lichess.{ Consumer, Start }
+import chessmap.lichess.{ Consumer }
 
 object Global extends GlobalSettings {
 

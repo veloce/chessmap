@@ -22,19 +22,14 @@ object Consumer {
 
 class Consumer(url: String) extends Actor {
 
-  context.setReceiveTimeout(3 seconds)
-
-  // calling run on the iteratee is a way to push an Input.EOF to it in order
-  // to close it
   override def preStart = {
-    WS.url(url).get { headers =>
-      Iteratee.fold() {
-        case (a, b) =>
-          self ! Handle(new String(b, "UTF-8"))
-        }
-    }.map { _ =>
-      println("lbusdfadslf")
-
+    WS.url(url).get { headers ⇒
+      Iteratee.foreach { bytes ⇒
+        println("&&&& iteratee still running &&&&&")
+        self ! Handle(new String(bytes, "UTF-8"))
+      }
+    }.onComplete { _ ⇒
+      self ! ConnectionClosed
     }
   }
 
@@ -46,14 +41,14 @@ class Consumer(url: String) extends Actor {
       // todo geoip logic and all that stuff
     }
 
-    // lichess stream inactive ? try to restart it
-    case ReceiveTimeout => {
-      throw new Exception("Received time out")
+    case ConnectionClosed ⇒ {
+      Thread.sleep(3000)
+      throw new Exception("Connection closed")
     }
 
   }
 
 }
 
-case object Start
+case object ConnectionClosed
 case class Handle(line: String)
