@@ -16,7 +16,7 @@ import play.api.libs.concurrent.Akka
 
 import models.LichessStream
 import models.LichessStream._
-import chessmap.{ Stub, StubActor, On, Off, Push }
+import chessmap.Lidata.{ Stub, StubActor, On, Off, Push }
 
 object Application extends Controller {
 

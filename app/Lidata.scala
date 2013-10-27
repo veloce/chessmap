@@ -1,4 +1,4 @@
-package chessmap
+package chessmap.Lidata
 
 import play.api.Play.current
 import play.api.libs.iteratee.{ Enumerator, Concurrent }
@@ -24,7 +24,6 @@ class StubActor(channel: Channel[String]) extends Actor {
   def on: Receive = {
     case Off  ⇒ context become off
     case Push ⇒ push
-    case _    ⇒
   }
 
   def off: Receive = {
@@ -32,12 +31,11 @@ class StubActor(channel: Channel[String]) extends Actor {
       push
       context become on
     }
-    case _ ⇒
   }
 
   private def push = {
     channel.push(iterator.next)
-    Akka.system.scheduler.scheduleOnce(100 milliseconds) {
+    context.system.scheduler.scheduleOnce(100 milliseconds) {
       self ! Push
     }
   }
