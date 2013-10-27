@@ -16,20 +16,21 @@ object LichessStream {
     .getOrElse("/opt/maxmind/GeoLiteCity.dat")
   val ipgeo = IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
 
-  val lineParser: Enumeratee[String, Move] = Enumeratee.map[String] { line ⇒
+  val lineParser: Enumeratee[String, Option[Move]] = Enumeratee.map[String] { line ⇒
     line.split("\\s") match {
-      case Array(id, move, ip) ⇒ new Move(id, move, ip)
+      case Array(id, move, ip) ⇒ Some(Move(id, move, ip))
+      case _                   ⇒ None
     }
   }
 
-  val toIpLocation: Enumeratee[Move, Option[IpLocation]] = Enumeratee.map[Move] { move ⇒
-    ipgeo.getLocation(move.ip)
+  val toIpLocation: Enumeratee[Option[Move], Option[IpLocation]] = Enumeratee.map[Option[Move]] { op ⇒
+    op.flatMap(move ⇒ ipgeo.getLocation(move.ip))
   }
 
   val toLocation: Enumeratee[Option[IpLocation], Location] =
     Enumeratee.mapInput[Option[IpLocation]] {
       case Input.El(Some(iploc)) ⇒ {
-        val loc = new Location(iploc.countryName, iploc.city, iploc.latitude,
+        val loc = Location(iploc.countryName, iploc.city, iploc.latitude,
           iploc.longitude)
         Input.El(loc)
       }
