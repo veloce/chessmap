@@ -1,4 +1,4 @@
-This is your new Play application
-=====================================
+## Download last maxmind GeoLite database :
 
-This file will be packaged with your application, when using `play dist`.
+    $ wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
+
