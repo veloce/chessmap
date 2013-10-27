@@ -2,6 +2,7 @@ package models
 
 import play.api.libs.iteratee._
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.Play.current
 
 import play.api.libs.json._
 
@@ -11,7 +12,9 @@ object LichessStream {
 
   val (enumerator, channel) = Concurrent.broadcast[String]
 
-  val ipgeo = IpGeo(dbFile = "/home/veloce/src/GeoLiteCity.dat", memCache = false, lruCache = 0)
+  val dbFile = current.configuration.getString("maxmind.db_file")
+    .getOrElse("/opt/maxmind/GeoLiteCity.dat")
+  val ipgeo = IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
 
   val lineParser: Enumeratee[String, Move] = Enumeratee.map[String] { line ⇒
     line.split("\\s") match {
