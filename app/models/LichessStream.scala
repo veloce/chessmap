@@ -13,10 +13,12 @@ object LichessStream extends Cache {
 
   val (enumerator, channel) = Concurrent.broadcast[String]
 
+  val cacheSize: Long = current.configuration.getLong("maxmind.ip_cache_size")
+    .getOrElse(10000)
   val dbFile = current.configuration.getString("maxmind.db_file")
     .getOrElse("/opt/maxmind/GeoLiteCity.dat")
   val ipgeo = IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
-  val ipCache: LoadingCache[String, Option[IpLocation]] = cache(1000, ipgeo.getLocation)
+  val ipCache: LoadingCache[String, Option[IpLocation]] = cache(cacheSize, ipgeo.getLocation)
 
   val lineParser: Enumeratee[String, Option[Move]] = Enumeratee.map[String] { line ⇒
     line.split("\\s") match {
