@@ -1,20 +1,22 @@
 package models
 
-import play.api.libs.iteratee._
+import com.google.common.cache.LoadingCache
+import com.snowplowanalytics.maxmind.geoip.{ IpGeo, IpLocation }
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.iteratee._
+import play.api.libs.json._
 import play.api.Play.current
 
-import play.api.libs.json._
+import chessmap.Cache
 
-import com.snowplowanalytics.maxmind.geoip.{ IpGeo, IpLocation }
-
-object LichessStream {
+object LichessStream extends Cache {
 
   val (enumerator, channel) = Concurrent.broadcast[String]
 
   val dbFile = current.configuration.getString("maxmind.db_file")
     .getOrElse("/opt/maxmind/GeoLiteCity.dat")
   val ipgeo = IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
+  val ipCache: LoadingCache[String, Option[IpLocation]] = cache(1000, ipgeo.getLocation)
 
   val lineParser: Enumeratee[String, Option[Move]] = Enumeratee.map[String] { line ⇒
     line.split("\\s") match {
@@ -24,7 +26,7 @@ object LichessStream {
   }
 
   val toIpLocation: Enumeratee[Option[Move], Option[IpLocation]] = Enumeratee.map[Option[Move]] { op ⇒
-    op.flatMap(move ⇒ ipgeo.getLocation(move.ip))
+    op.flatMap(move ⇒ ipCache.get(move.ip))
   }
 
   val toLocation: Enumeratee[Option[IpLocation], Location] =
