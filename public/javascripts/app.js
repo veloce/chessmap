@@ -32,18 +32,15 @@ $(function() {
         };
     };
 
-    // dot2 = r.circle().attr({stroke: "#000", r: 0}),
-
     if (!!window.EventSource) {
         var source = new EventSource("/stream");
         source.addEventListener('message', function(e) {
             var data = JSON.parse(e.data);
-            var dot = paper.circle().attr({fill: "r#FE7727:50-#F57124:100", stroke: "#fff", "stroke-width": 2, r: 0});
+            var dot = paper.circle().attr({fill: "r#FE7727:50-#F57124:100", r:2});
             var attr = world.getXY(data.latitude, data.longitude);
-            attr.r = 0;
-            dot.attr(attr).animate({r: 5}, 1000, "elastic", function() {
-                this.remove();
-            });
+            attr.r = 2;
+            dot.attr(attr);
+            setTimeout(function() { dot.remove(); }, 1000);
         }, false);
         source.addEventListener('open', function(e) {
             // Connection was opened.
