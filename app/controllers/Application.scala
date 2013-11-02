@@ -48,7 +48,8 @@ object Application extends Controller {
 
   def stream = Action {
     val source = LichessStream.enumerator &> lineParser &>
-    toIpLocation &> toLocation &> asJson &> EventSource()
+    toIpLocation &> toLocation &> withOpponentLocation &> 
+    asJson &> EventSource()
 
     Ok.chunked(source).as("text/event-stream")
   }

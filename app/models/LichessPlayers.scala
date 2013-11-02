@@ -2,16 +2,15 @@ package models
 
 import chessmap.Cache
 import com.google.common.cache.{ Cache => GuavaCache }
-import com.snowplowanalytics.maxmind.geoip.IpLocation
 
-object LichessPlayers extends Cache {
+final class LichessPlayers extends Cache {
 
   // to each game ID, associate list of player Locations
   // there can be 0, 1 or 2 players per game ID,
   // but this constraint is not expressed by the cache type :(
-  private val cache: GuavaCache[String, List[IpLocation]] = cache(1000)
+  private val cache: GuavaCache[String, List[Location]] = cache(1000)
 
-  def getOpponentLocation(gameId: String, myLocation: IpLocation): Option[IpLocation] = 
+  def getOpponentLocation(gameId: String, myLocation: Location): Option[Location] = 
 
     Option(cache getIfPresent gameId) getOrElse Nil match {
 

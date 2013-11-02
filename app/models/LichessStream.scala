@@ -1,8 +1,8 @@
 package models
 
-import java.io.File
 import com.google.common.cache.LoadingCache
 import com.snowplowanalytics.maxmind.geoip.{ IpGeo, IpLocation }
+import java.io.File
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
@@ -20,6 +20,11 @@ object LichessStream extends Cache {
   val ipgeo = new IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
   val ipCache: LoadingCache[String, Option[IpLocation]] = cache(cacheSize, ipgeo.getLocation)
 
+  val players = new LichessPlayers
+
+  type OpponentLocation = Option[Location]
+  type LocationPair = (Location, OpponentLocation)
+
   val lineParser: Enumeratee[String, Option[Move]] = Enumeratee.map[String] { line ⇒
     line.split("\\s") match {
       case Array(id, move, ip) ⇒ Some(Move(id, move, ip))
@@ -27,27 +32,37 @@ object LichessStream extends Cache {
     }
   }
 
-  val toIpLocation: Enumeratee[Option[Move], Option[IpLocation]] = Enumeratee.map[Option[Move]] { op ⇒
-    op.flatMap(move ⇒ ipCache.get(move.ip))
+  val toIpLocation: Enumeratee[Option[Move], Option[MoveWith[IpLocation]]] = Enumeratee.map[Option[Move]] { op ⇒
+    op.flatMap(move ⇒ ipCache.get(move.ip) map { ipLocation ⇒
+      MoveWith(move, ipLocation)
+    })
   }
 
-  val toLocation: Enumeratee[Option[IpLocation], Location] =
-    Enumeratee.mapInput[Option[IpLocation]] {
-      case Input.El(Some(iploc)) ⇒ {
+  val toLocation: Enumeratee[Option[MoveWith[IpLocation]], MoveWith[Location]] =
+    Enumeratee.mapInput {
+      case Input.El(Some(MoveWith(move, iploc))) ⇒ {
         val loc = Location(iploc.countryName, iploc.region, iploc.city, iploc.latitude,
           iploc.longitude)
-        Input.El(loc)
+        Input.El(MoveWith(move, loc))
       }
       case _ ⇒ Input.Empty
     }
 
-  val asJson: Enumeratee[Location, JsValue] = Enumeratee.map[Location] { loc ⇒
-    Json.obj(
-      "countryName" -> loc.countryName,
-      "region" -> loc.region,
-      "city" -> Json.toJson[Option[String]](loc.city),
-      "latitude" -> loc.latitude,
-      "longitude" -> loc.longitude
+  val withOpponentLocation: Enumeratee[MoveWith[Location], LocationPair] =
+    Enumeratee.map {
+      case MoveWith(move, myLocation) => 
+        myLocation -> players.getOpponentLocation(move.gameId, myLocation)
+    }
+
+  val asJson: Enumeratee[LocationPair, JsValue] = Enumeratee.map {
+    case (myLocation, opponentLocation) ⇒ Json.obj(
+      "countryName" -> myLocation.countryName,
+      "region" -> myLocation.region,
+      "city" -> Json.toJson(myLocation.city),
+      "latitude" -> myLocation.latitude,
+      "longitude" -> myLocation.longitude,
+      "oLatitude" -> opponentLocation.map(_.latitude),
+      "oLongitude" -> opponentLocation.map(_.longitude)
     )
   }
 
@@ -64,3 +79,5 @@ case class Move(
   gameId: String,
   move: String,
   ip: String)
+
+case class MoveWith[A](move: Move, value: A)
