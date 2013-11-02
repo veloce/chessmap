@@ -1,23 +1,7 @@
 @main("Welcome to Play") {
 
-<script type="text/javascript" charset="utf-8">
-var source = new EventSource("/stream");
-source.addEventListener('message', function(e) {
-  var json = JSON.parse(e.data)
-  console.log(json);
-}, false);
-source.addEventListener('open', function(e) {
-  // Connection was opened.
-  console.log("connection opened");
-}, false);
-source.addEventListener('error', function(e) {
-  if (e.readyState == EventSource.CLOSED) {
-    // Connection was closed.
-    console.log("connection closed");
-  }
-}, false);
-</script>
+<h1>Lichess activity</h1>
 
-<h1>nothing here yet</h1>
+<div id="worldmap"></div>
 
 }

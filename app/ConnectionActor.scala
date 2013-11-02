@@ -14,7 +14,6 @@ class Connection(url: String) extends Actor {
   override def preStart = {
     WS.url(url).get { headers ⇒
       Iteratee.foreach { bytes ⇒
-        println("handled", bytes)
         LichessStream.channel.push(new String(bytes, "UTF-8"))
       }
     }.onComplete { _ ⇒
