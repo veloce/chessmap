@@ -1,5 +1,6 @@
 package models
 
+import java.io.File
 import com.google.common.cache.LoadingCache
 import com.snowplowanalytics.maxmind.geoip.{ IpGeo, IpLocation }
 import play.api.libs.concurrent.Execution.Implicits._
@@ -15,9 +16,8 @@ object LichessStream extends Cache {
 
   val cacheSize: Long = current.configuration.getLong("maxmind.ip_cache_size")
     .getOrElse(10000)
-  val dbFile = current.configuration.getString("maxmind.db_file")
-    .getOrElse("/opt/maxmind/GeoLiteCity.dat")
-  val ipgeo = IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
+  val dbFile = new File("conf/GeoLiteCity.dat")
+  val ipgeo = new IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
   val ipCache: LoadingCache[String, Option[IpLocation]] = cache(cacheSize, ipgeo.getLocation)
 
   val lineParser: Enumeratee[String, Option[Move]] = Enumeratee.map[String] { line ⇒
