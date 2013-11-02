@@ -1,6 +1,11 @@
 $(function() {
-    var paper = Raphael(document.getElementById("worldmap"), 1000, 400);
-    paper.rect(0, 0, 1000, 400, 10).attr({
+    var worldWith = window.innerWidth - 30,
+    mapRatio = 0.4,
+    worldHeight = worldWith * mapRatio,
+    wScale = worldWith / 1000,
+    hScale = worldHeight / 400;
+    var paper = Raphael(document.getElementById("worldmap"), worldWith, worldHeight);
+    paper.rect(0, 0, worldWith, worldHeight, 10).attr({
         stroke: "none",
         fill: "0-#9bb7cb-#adc8da"
     });
@@ -14,15 +19,14 @@ $(function() {
     paper.setStart();
     var hue = Math.random();
     for (var country in worldmap.shapes) {
-        paper.path(worldmap.shapes[country]).attr({stroke: "#ccc6ae", fill: "#f0efeb", "stroke-opacity": 0.25});
+        paper.path(worldmap.shapes[country]).attr({stroke: "#ccc6ae", fill: "#f0efeb", "stroke-opacity": 0.25}).transform("s" + wScale + "," + hScale + " 0,0");
     }
     var world = paper.setFinish();
     world.hover(over, out);
-    // world.animate({fill: "#666", stroke: "#666"}, 2000);
     world.getXY = function (lat, lon) {
         return {
-            cx: lon * 2.6938 + 465.4,
-            cy: lat * -2.6938 + 227.066
+            cx: lon * (2.6938 * wScale) + (465.4 * wScale),
+            cy: lat * (-2.6938 * hScale) + (227.066 * hScale)
         };
     };
     world.getLatLon = function (x, y) {
