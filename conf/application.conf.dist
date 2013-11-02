@@ -12,7 +12,6 @@ application.secret="jLTiairY3fMOcLTE]L8mqsj5i=tlZUOB;nFSSI<oJPBdAwt59[bh8nPTxJTp
 application.langs="en"
 
 lichess.stream_url="http://en.lichess.org/stream"
-maxmind.db_file="/opt/maxmind/GeoLiteCity.dat"
 maxmind.ip_cache_size=10000
 
 # Logger
