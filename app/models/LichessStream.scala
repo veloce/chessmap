@@ -34,7 +34,7 @@ object LichessStream extends Cache {
   val toLocation: Enumeratee[Option[IpLocation], Location] =
     Enumeratee.mapInput[Option[IpLocation]] {
       case Input.El(Some(iploc)) ⇒ {
-        val loc = Location(iploc.countryName, iploc.city, iploc.latitude,
+        val loc = Location(iploc.countryName, iploc.region, iploc.city, iploc.latitude,
           iploc.longitude)
         Input.El(loc)
       }
@@ -44,6 +44,7 @@ object LichessStream extends Cache {
   val asJson: Enumeratee[Location, JsValue] = Enumeratee.map[Location] { loc ⇒
     Json.obj(
       "countryName" -> loc.countryName,
+      "region" -> loc.region,
       "city" -> Json.toJson[Option[String]](loc.city),
       "latitude" -> loc.latitude,
       "longitude" -> loc.longitude
@@ -54,6 +55,7 @@ object LichessStream extends Cache {
 
 case class Location(
   countryName: String,
+  region: Option[String],
   city: Option[String],
   latitude: Float,
   longitude: Float)
