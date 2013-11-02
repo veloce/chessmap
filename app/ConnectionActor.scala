@@ -12,7 +12,7 @@ import models.LichessStream
 class Connection(url: String) extends Actor {
 
   override def preStart = {
-    WS.url(url).get { headers ⇒
+    WS.url(url).withRequestTimeout(-1).get { headers ⇒
       Iteratee.foreach { bytes ⇒
         LichessStream.channel.push(new String(bytes, "UTF-8"))
       }
