@@ -3,6 +3,7 @@ package models
 import com.google.common.cache.LoadingCache
 import com.snowplowanalytics.maxmind.geoip.{ IpGeo, IpLocation }
 import java.io.File
+import scala.collection.JavaConversions._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
@@ -20,7 +21,9 @@ object LichessStream extends Cache {
   val ipgeo = new IpGeo(dbFile = dbFile, memCache = false, lruCache = 0)
   val ipCache: LoadingCache[String, Option[IpLocation]] = cache(cacheSize, ipgeo.getLocation)
 
-  val players = new LichessPlayers
+  val aiIps: List[String] = current.configuration.underlying.getStringList("lichess.ai_ips").toList
+  val aiLocations = (aiIps map ipCache.get).flatten map Location.apply
+  val players = new LichessPlayers(aiLocations.toSet)
 
   type OpponentLocation = Option[Location]
   type LocationPair = (Location, OpponentLocation)
@@ -41,9 +44,7 @@ object LichessStream extends Cache {
   val toLocation: Enumeratee[Option[MoveWith[IpLocation]], MoveWith[Location]] =
     Enumeratee.mapInput {
       case Input.El(Some(MoveWith(move, iploc))) ⇒ {
-        val loc = Location(iploc.countryName, iploc.region, iploc.city, iploc.latitude,
-          iploc.longitude)
-        Input.El(MoveWith(move, loc))
+        Input.El(MoveWith(move, Location(iploc)))
       }
       case _ ⇒ Input.Empty
     }
@@ -74,6 +75,13 @@ case class Location(
   city: Option[String],
   latitude: Float,
   longitude: Float)
+
+object Location {
+
+  def apply(ipLoc: IpLocation): Location =
+    Location(ipLoc.countryName, ipLoc.region, ipLoc.city, ipLoc.latitude, ipLoc.longitude)
+}
+
 
 case class Move(
   gameId: String,

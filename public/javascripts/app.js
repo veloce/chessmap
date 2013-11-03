@@ -46,7 +46,7 @@ $(function() {
             else density[densityKey]++;
             var dot = paper.circle().attr({
               fill: "#FE7727",
-              r: density[densityKey] + 1,
+              r: density[densityKey] + 2,
               'stroke-width': 0
             });
             var orig = world.getXY(data.latitude, data.longitude);

@@ -12,6 +12,10 @@ application.secret="jLTiairY3fMOcLTE]L8mqsj5i=tlZUOB;nFSSI<oJPBdAwt59[bh8nPTxJTp
 application.langs="en"
 
 lichess.stream_url="http://en.lichess.org/stream"
+lichess.ai_ips=[
+  "91.121.7.111",  # ai-paul.lichess.org
+  "198.50.141.73", # ai-salim.lichess.org
+]
 maxmind.ip_cache_size=10000
 
 # Logger
