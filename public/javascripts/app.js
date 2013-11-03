@@ -22,7 +22,8 @@ $(function() {
     };
 
     if (!!window.EventSource) {
-        var density = {};
+        var density = {},
+        nMoves = 0;
         var source = new EventSource("/stream");
         source.addEventListener('message', function(e) {
             var data = JSON.parse(e.data);
@@ -51,6 +52,10 @@ $(function() {
               });
               setTimeout(function() { line.remove(); }, 500);
             }
+
+            // stats
+            nMoves++;
+            $('#moves > span').text(nMoves);
         }, false);
         source.addEventListener('open', function(e) {
             // Connection was opened.

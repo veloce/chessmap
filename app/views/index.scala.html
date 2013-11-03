@@ -9,4 +9,40 @@
 
 <div id="worldmap"></div>
 
+<div id="stats">
+    <div id="time">time: <span></span></div>
+    <div id="moves">moves: <span></span></div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        var since = Date.now();
+
+        function startTime()
+        {
+            var now = Date.now(),
+            elapsed = new Date(now - since);
+            var h=elapsed.getUTCHours();
+            var m=elapsed.getUTCMinutes();
+            var s=elapsed.getUTCSeconds();
+            // add a zero in front of numbers<10
+            h=formatTime(h);
+            m=formatTime(m);
+            s=formatTime(s);
+            $('#time > span').text(h+":"+m+":"+s);
+            setTimeout(function(){startTime()},500);
+        }
+
+        function formatTime(i)
+        {
+            if (i<10)
+            {
+                i="0" + i;
+            }
+            return i;
+        }
+
+        startTime();
+    });
+</script>
 }
