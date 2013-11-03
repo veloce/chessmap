@@ -37,14 +37,34 @@ $(function() {
     };
 
     if (!!window.EventSource) {
+        var density = {};
         var source = new EventSource("/stream");
         source.addEventListener('message', function(e) {
             var data = JSON.parse(e.data);
-            var dot = paper.circle().attr({fill: "r#FE7727:50-#F57124:100", r:2});
-            var attr = world.getXY(data.latitude, data.longitude);
-            attr.r = 2;
-            dot.attr(attr);
-            setTimeout(function() { dot.remove(); }, 1000);
+            var densityKey = data.latitude + "" + data.longitude;
+            if (typeof density[densityKey] == 'undefined') density[densityKey] = 1;
+            else density[densityKey]++;
+            var dot = paper.circle().attr({
+              fill: "#FE7727",
+              r: density[densityKey] + 2,
+              'stroke-width': 0
+            });
+            var orig = world.getXY(data.latitude, data.longitude);
+            dot.attr(orig);
+            setTimeout(function() { 
+              dot.remove(); 
+              density[densityKey]--;
+            }, 1000);
+            if (data.oLatitude) {
+              var dest = world.getXY(data.oLatitude, data.oLongitude);
+              var str = "M" + orig.cx + "," + orig.cy + "T" + dest.cx + "," + dest.cy;
+              var line = paper.path(str);
+              line.attr({
+                opacity: 0.15,
+                'arrow-end': 'oval-wide-long'
+              });
+              setTimeout(function() { line.remove(); }, 500);
+            }
         }, false);
         source.addEventListener('open', function(e) {
             // Connection was opened.
