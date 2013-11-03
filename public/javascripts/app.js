@@ -37,19 +37,27 @@ $(function() {
     };
 
     if (!!window.EventSource) {
+        var density = {};
         var source = new EventSource("/stream");
         source.addEventListener('message', function(e) {
             var data = JSON.parse(e.data);
+            var densityKey = data.latitude + "" + data.longitude;
+            if (typeof density[densityKey] == 'undefined') density[densityKey] = 1;
+            else density[densityKey]++;
             var dot = paper.circle().attr({
               fill: "#FE7727",
-              r:2
+              r: density[densityKey] + 1,
+              'stroke-width': 0
             });
             var orig = world.getXY(data.latitude, data.longitude);
             dot.attr(orig);
-            setTimeout(function() { dot.remove(); }, 1000);
+            setTimeout(function() { 
+              dot.remove(); 
+              density[densityKey]--;
+            }, 1000);
             if (data.oLatitude) {
               var dest = world.getXY(data.oLatitude, data.oLongitude);
-              var str = "M" + orig.cx + "," + orig.cy + "L" + dest.cx + "," + dest.cy;
+              var str = "M" + orig.cx + "," + orig.cy + "T" + dest.cx + "," + dest.cy;
               var line = paper.path(str);
               line.attr({
                 opacity: 0.15,
