@@ -40,7 +40,10 @@ $(function() {
         var source = new EventSource("/stream");
         source.addEventListener('message', function(e) {
             var data = JSON.parse(e.data);
-            var dot = paper.circle().attr({fill: "r#FE7727:50-#F57124:100", r:2});
+            var dot = paper.circle().attr({
+              fill: "#FE7727",
+              r:2
+            });
             var orig = world.getXY(data.latitude, data.longitude);
             dot.attr(orig);
             setTimeout(function() { dot.remove(); }, 1000);
@@ -52,7 +55,7 @@ $(function() {
                 opacity: 0.15,
                 'arrow-end': 'oval-wide-long'
               });
-              setTimeout(function() { line.remove(); }, 1000);
+              setTimeout(function() { line.remove(); }, 500);
             }
         }, false);
         source.addEventListener('open', function(e) {
