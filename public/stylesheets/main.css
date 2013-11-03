@@ -1,0 +1,10 @@
+body {
+  /* based on lichess dark theme */
+  font:12px'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, Sans-Serif;
+  color: #909090;
+  background: #1a1a1a;
+}
+
+h1 {
+  text-align: center;
+}
