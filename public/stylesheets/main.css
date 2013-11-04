@@ -21,3 +21,13 @@ h1 a {
 .extension {
   color: #606060;
 }
+
+.wrap {
+  float: left;
+  padding: 0 10px;
+}
+
+#stats {
+  float: left;
+  margin-bottom: 10px;
+}

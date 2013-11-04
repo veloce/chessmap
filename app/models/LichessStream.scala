@@ -3,11 +3,11 @@ package models
 import com.google.common.cache.LoadingCache
 import com.snowplowanalytics.maxmind.geoip.{ IpGeo, IpLocation }
 import java.io.File
-import scala.collection.JavaConversions._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee._
 import play.api.libs.json._
 import play.api.Play.current
+import scala.collection.JavaConversions._
 
 import chessmap.Cache
 
@@ -51,37 +51,36 @@ object LichessStream extends Cache {
 
   val withOpponentLocation: Enumeratee[MoveWith[Location], LocationPair] =
     Enumeratee.map {
-      case MoveWith(move, myLocation) => 
+      case MoveWith(move, myLocation) ⇒
         myLocation -> players.getOpponentLocation(move.gameId, myLocation)
     }
 
   val asJson: Enumeratee[LocationPair, JsValue] = Enumeratee.map {
     case (myLocation, opponentLocation) ⇒ Json.obj(
-      "countryName" -> myLocation.countryName,
+      "country" -> myLocation.country,
       "region" -> myLocation.region,
       "city" -> Json.toJson(myLocation.city),
-      "latitude" -> myLocation.latitude,
-      "longitude" -> myLocation.longitude,
-      "oLatitude" -> opponentLocation.map(_.latitude),
-      "oLongitude" -> opponentLocation.map(_.longitude)
+      "lat" -> myLocation.lat,
+      "lon" -> myLocation.lon,
+      "oLat" -> opponentLocation.map(_.lat),
+      "oLon" -> opponentLocation.map(_.lon)
     )
   }
 
 }
 
 case class Location(
-  countryName: String,
+  country: String,
   region: Option[String],
   city: Option[String],
-  latitude: Float,
-  longitude: Float)
+  lat: Float,
+  lon: Float)
 
 object Location {
 
   def apply(ipLoc: IpLocation): Location =
     Location(ipLoc.countryName, ipLoc.region, ipLoc.city, ipLoc.latitude, ipLoc.longitude)
 }
-
 
 case class Move(
   gameId: String,

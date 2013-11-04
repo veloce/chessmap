@@ -1,3 +1,8 @@
+var stats = {
+    nMoves: 0,
+    countries: {}
+};
+
 $(function() {
     var worldWith = window.innerWidth - 30,
     mapRatio = 0.4,
@@ -22,12 +27,12 @@ $(function() {
     };
 
     if (!!window.EventSource) {
-        var density = {},
-        nMoves = 0;
+        var density = {};
         var source = new EventSource("/stream");
+
         source.addEventListener('message', function(e) {
             var data = JSON.parse(e.data);
-            var densityKey = data.latitude + "" + data.longitude;
+            var densityKey = data.lat + "" + data.lon;
             if (typeof density[densityKey] == 'undefined') density[densityKey] = 1;
             else density[densityKey]++;
             var dot = paper.circle().attr({
@@ -35,14 +40,14 @@ $(function() {
               r: density[densityKey] + 2,
               'stroke-width': 0
             });
-            var orig = world.getXY(data.latitude, data.longitude);
+            var orig = world.getXY(data.lat, data.lon);
             dot.attr(orig);
             setTimeout(function() {
               dot.remove();
               density[densityKey]--;
             }, 1000);
-            if (data.oLatitude) {
-              var dest = world.getXY(data.oLatitude, data.oLongitude);
+            if (data.oLat) {
+              var dest = world.getXY(data.oLat, data.oLon);
               var str = "M" + orig.cx + "," + orig.cy + "T" + dest.cx + "," + dest.cy;
               var line = paper.path(str);
               line.attr({
@@ -53,9 +58,15 @@ $(function() {
               setTimeout(function() { line.remove(); }, 500);
             }
 
-            // stats
-            nMoves++;
-            $('#moves > span').text(nMoves);
+            // moves
+            stats.nMoves++;
+            $('#moves > span').text(stats.nMoves);
+            // top countries
+            if (data.country in stats.countries) {
+                stats.countries[data.country] = stats.countries[data.country] + 1;
+            } else {
+                stats.countries[data.country] = 1;
+            }
         }, false);
         source.addEventListener('open', function(e) {
             // Connection was opened.
