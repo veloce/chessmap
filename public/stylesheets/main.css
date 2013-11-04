@@ -18,16 +18,40 @@ h1 a {
   text-decoration: none;
 }
 
+a {
+  color: inherit;
+}
+
 .extension {
   color: #606060;
 }
 
-.wrap {
+.wrapL {
   float: left;
-  padding: 0 10px;
+  margin-right: 20px;
+}
+
+.clear {
+  clear: both;
 }
 
 #stats {
-  float: left;
-  margin-bottom: 10px;
+  position: absolute;
+}
+
+#legend {
+  margin: 20px 0;
+}
+
+.dot {
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+.human {
+  color: #fe7727;
+}
+
+.ia {
+  color: #be4701;
 }

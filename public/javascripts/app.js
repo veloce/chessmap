@@ -9,24 +9,29 @@ $(function() {
     var worldWith = window.innerWidth - 30,
     mapRatio = 0.4,
     worldHeight = worldWith * mapRatio,
-    wScale = worldWith / 1000,
-    hScale = worldHeight / 400;
+    scale = worldWith / 1000;
     var paper = Raphael(document.getElementById("worldmap"), worldWith, worldHeight);
     paper.rect(0, 0, worldWith, worldHeight, 10).attr({
         stroke: "none"
     });
     paper.setStart();
-    var hue = Math.random();
     for (var country in worldmap.shapes) {
-        paper.path(worldmap.shapes[country]).attr({stroke: "#343C40", fill: "#67777F", "stroke-opacity": 0.25}).transform("s" + wScale + "," + hScale + " 0,0");
+        paper.path(worldmap.shapes[country]).attr({stroke: "#343C40", fill: "#67777F", "stroke-opacity": 0.25}).transform("s" + scale + "," + scale + " 0,0");
     }
     var world = paper.setFinish();
     world.getXY = function (lat, lon) {
         return {
-            cx: lon * (2.6938 * wScale) + (465.4 * wScale),
-            cy: lat * (-2.6938 * hScale) + (227.066 * hScale)
+            cx: lon * (2.6938 * scale) + (465.4 * scale),
+            cy: lat * (-2.6938 * scale) + (227.066 * scale)
         };
     };
+
+    // position legend and stats
+    var worldOffset = $('#worldmap').offset();
+    $('#stats').offset({
+        top: worldOffset.top + 250 * scale,
+        left: worldOffset.left + 7.6 * scale
+    }).attr({width: 195 * scale, height: 172 * scale});
 
     if (!!window.EventSource) {
         var density = {};
@@ -38,7 +43,7 @@ $(function() {
             if (typeof density[densityKey] == 'undefined') density[densityKey] = 1;
             else density[densityKey]++;
             var dot = paper.circle().attr({
-                fill: "#FE7727",
+                fill: data.isIA ? "#be4701" : "#FE7727",
                 r: density[densityKey] + 2,
                 'stroke-width': 0
             });
@@ -53,7 +58,7 @@ $(function() {
                 var str = "M" + orig.cx + "," + orig.cy + "T" + dest.cx + "," + dest.cy;
                 var line = paper.path(str);
                 line.attr({
-                    opacity: 0.65,
+                    opacity: 0.35,
                     stroke: "#FE7727",
                     'arrow-end': 'oval-wide-long'
                 });
