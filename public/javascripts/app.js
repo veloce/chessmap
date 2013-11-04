@@ -1,5 +1,7 @@
 var stats = {
     nMoves: 0,
+    humanMoves: 0,
+    iaMoves: 0,
     countries: {}
 };
 
@@ -60,7 +62,11 @@ $(function() {
 
             // moves
             stats.nMoves++;
+            if (data.isIA) stats.iaMoves++;
+            else stats.humanMoves++;
             $('#moves > span').text(stats.nMoves);
+            $('#humanMoves > span').text(stats.humanMoves);
+            $('#iaMoves > span').text(stats.iaMoves);
             // top countries
             if (data.country in stats.countries) {
                 stats.countries[data.country] = stats.countries[data.country] + 1;
