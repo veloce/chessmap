@@ -38,26 +38,26 @@ $(function() {
             if (typeof density[densityKey] == 'undefined') density[densityKey] = 1;
             else density[densityKey]++;
             var dot = paper.circle().attr({
-              fill: "#FE7727",
-              r: density[densityKey] + 2,
-              'stroke-width': 0
+                fill: "#FE7727",
+                r: density[densityKey] + 2,
+                'stroke-width': 0
             });
             var orig = world.getXY(data.lat, data.lon);
             dot.attr(orig);
             setTimeout(function() {
-              dot.remove();
-              density[densityKey]--;
+                dot.remove();
+                density[densityKey]--;
             }, 1000);
             if (data.oLat) {
-              var dest = world.getXY(data.oLat, data.oLon);
-              var str = "M" + orig.cx + "," + orig.cy + "T" + dest.cx + "," + dest.cy;
-              var line = paper.path(str);
-              line.attr({
-                opacity: 0.65,
-                stroke: "#FE7727",
-                'arrow-end': 'oval-wide-long'
-              });
-              setTimeout(function() { line.remove(); }, 500);
+                var dest = world.getXY(data.oLat, data.oLon);
+                var str = "M" + orig.cx + "," + orig.cy + "T" + dest.cx + "," + dest.cy;
+                var line = paper.path(str);
+                line.attr({
+                    opacity: 0.65,
+                    stroke: "#FE7727",
+                    'arrow-end': 'oval-wide-long'
+                });
+                setTimeout(function() { line.remove(); }, 500);
             }
 
             // moves
@@ -68,11 +68,8 @@ $(function() {
             $('#humanMoves > span').text(stats.humanMoves);
             $('#iaMoves > span').text(stats.iaMoves);
             // top countries
-            if (data.country in stats.countries) {
-                stats.countries[data.country] = stats.countries[data.country] + 1;
-            } else {
-                stats.countries[data.country] = 1;
-            }
+            if (data.country in stats.countries) stats.countries[data.country]++;
+            else stats.countries[data.country] = 1;
         }, false);
         source.addEventListener('open', function(e) {
             // Connection was opened.
